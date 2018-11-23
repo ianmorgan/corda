@@ -59,7 +59,7 @@ private constructor(
         //  get rid of them.
         override val networkParameters: NetworkParameters?,
         override val references: List<StateAndRef<ContractState>>,
-        val inputStatesContractClassNameToVersions: Map<ContractClassName,Set<Version>>
+        private val inputStatesContractClassNameToVersions: Map<ContractClassName,Set<Version>>
         //DOCEND 1
 ) : FullTransaction() {
     // These are not part of the c'tor above as that defines LedgerTransaction's serialisation format
