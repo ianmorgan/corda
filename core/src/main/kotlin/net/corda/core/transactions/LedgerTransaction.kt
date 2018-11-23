@@ -347,7 +347,8 @@ private constructor(
                     timeWindow = this.timeWindow,
                     privacySalt = this.privacySalt,
                     networkParameters = this.networkParameters,
-                    references = deserializedReferences
+                    references = deserializedReferences,
+                    inputStatesContractClassNameToVersions = emptyMap()
             )
         } else {
             // This branch is only present for backwards compatibility.
@@ -860,7 +861,7 @@ private constructor(
             notary: Party?,
             timeWindow: TimeWindow?,
             privacySalt: PrivacySalt
-    ) : this(inputs, outputs, commands, attachments, id, notary, timeWindow, privacySalt, null, emptyList())
+    ) : this(inputs, outputs, commands, attachments, id, notary, timeWindow, privacySalt, null, emptyList(), emptyMap())
 
     @Deprecated("LedgerTransaction should not be created directly, use WireTransaction.toLedgerTransaction instead.")
     @DeprecatedConstructorForDeserialization(1)
@@ -874,7 +875,7 @@ private constructor(
             timeWindow: TimeWindow?,
             privacySalt: PrivacySalt,
             networkParameters: NetworkParameters
-    ) : this(inputs, outputs, commands, attachments, id, notary, timeWindow, privacySalt, networkParameters, emptyList())
+    ) : this(inputs, outputs, commands, attachments, id, notary, timeWindow, privacySalt, networkParameters, emptyList(),emptyMap())
 
     @Deprecated("LedgerTransactions should not be created directly, use WireTransaction.toLedgerTransaction instead.")
     fun copy(inputs: List<StateAndRef<ContractState>>,
@@ -896,7 +897,8 @@ private constructor(
                 timeWindow = timeWindow,
                 privacySalt = privacySalt,
                 networkParameters = networkParameters,
-                references = references
+                references = references,
+                inputStatesContractClassNameToVersions = emptyMap()
         )
     }
 
@@ -921,7 +923,8 @@ private constructor(
                 timeWindow = timeWindow,
                 privacySalt = privacySalt,
                 networkParameters = networkParameters,
-                references = references
+                references = references,
+                inputStatesContractClassNameToVersions = emptyMap()
         )
     }
 }
