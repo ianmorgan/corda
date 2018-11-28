@@ -9,6 +9,7 @@ import net.corda.core.crypto.SecureHash
 import net.corda.core.flows.FlowLogic
 import net.corda.core.flows.StateMachineRunId
 import net.corda.core.identity.CordaX500Name
+import net.corda.core.identity.Party
 import net.corda.core.identity.PartyAndCertificate
 import net.corda.core.internal.SignedDataWithCert
 import net.corda.core.messaging.DataFeed
@@ -41,12 +42,16 @@ import net.corda.testing.internal.MockCordappProvider
 import net.corda.testing.internal.configureDatabase
 import net.corda.testing.node.internal.*
 import net.corda.testing.services.MockAttachmentStorage
+import java.io.ByteArrayOutputStream
 import java.security.KeyPair
 import java.sql.Connection
 import java.time.Clock
 import java.time.Instant
 import java.util.*
 import java.util.function.Consumer
+import java.util.jar.JarFile
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 import javax.persistence.EntityManager
 import kotlin.collections.HashMap
 
@@ -145,6 +150,25 @@ open class MockServices private constructor(
 
         // Because Kotlin is dumb and makes not publicly visible objects public, thus changing the public API.
         private val mockStateMachineRecordedTransactionMappingStorage = MockStateMachineRecordedTransactionMappingStorage()
+
+
+        private val dummyAttachment by lazy {
+            val inputStream = ByteArrayOutputStream().apply {
+                ZipOutputStream(this).use {
+                    with(it) {
+                        putNextEntry(ZipEntry(JarFile.MANIFEST_NAME))
+                    }
+                }
+            }.toByteArray().inputStream()
+            val attachment = object : Attachment {
+                override val id get() = throw UnsupportedOperationException()
+                override fun open() = inputStream
+                override val signerKeys get() = throw UnsupportedOperationException()
+                override val signers: List<Party> get() = throw UnsupportedOperationException()
+                override val size: Int = 512
+            }
+            attachment
+        }
     }
 
     private class MockStateMachineRecordedTransactionMappingStorage : StateMachineRecordedTransactionMappingStorage {
@@ -302,7 +326,7 @@ open class MockServices private constructor(
     override fun loadState(stateRef: StateRef) = servicesForResolution.loadState(stateRef)
     override fun loadStates(stateRefs: Set<StateRef>) = servicesForResolution.loadStates(stateRefs)
 
-    override fun loadContractAttachment(stateRef: StateRef) = try { servicesForResolution.loadContractAttachment(stateRef) } catch (e: Exception) { null }
+    override fun loadContractAttachment(stateRef: StateRef) = try { servicesForResolution.loadContractAttachment(stateRef) } catch (e: Exception) { dummyAttachment }
 }
 
 /**
